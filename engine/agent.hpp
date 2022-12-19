@@ -3,11 +3,13 @@
 #include "action.hpp"
 #include "state.hpp"
 
-class AgentBase{
+class AgentBase
+{
 public:
     virtual Action RequestAction(State state) = 0;
-    virtual std::string GetAgentName(){
+    virtual std::string GetAgentName()
+    {
         return "AgentBase";
     }
-    virtual ~AgentBase() {};
+    virtual ~AgentBase(){};
 };

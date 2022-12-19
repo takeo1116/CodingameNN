@@ -16,25 +16,25 @@ const std::array<std::tuple<char, char, char>, 8> LocalBoard::bingo = {
 
 std::array<Player, 9> LocalBoard::Flatten()
 {
-    return localBoard;
+    return local_board;
 }
 
 std::array<bool, 9> LocalBoard::MakeLegalMoveMap()
 {
     /*このlocalMap中で、合法手となりうる場所*/
-    std::array<bool, 9> legalMoveMap = {};
+    std::array<bool, 9> legal_move_map = {};
     if (CheckState() != Result::NO_SET)
-        return legalMoveMap;
+        return legal_move_map;
 
     for (int pos = 0; pos < 9; pos++)
-        legalMoveMap[pos] = (localBoard[pos] == Player::NO_SET);
-    return legalMoveMap;
+        legal_move_map[pos] = (local_board[pos] == Player::NO_SET);
+    return legal_move_map;
 }
 
 bool LocalBoard::IsFull()
 {
-    /*LocalBoardがすべて埋まっているか？*/
-    for (auto a : localBoard)
+    /*local_boardがすべて埋まっているか？*/
+    for (auto a : local_board)
         if (a == Player::NO_SET)
             return false;
     return true;
@@ -43,7 +43,7 @@ bool LocalBoard::IsFull()
 void LocalBoard::Mark(int pos, Player player)
 {
     /*posにplayerの手をマークする*/
-    localBoard[pos] = player;
+    local_board[pos] = player;
 }
 
 Result LocalBoard::CheckState()
@@ -54,9 +54,9 @@ Result LocalBoard::CheckState()
 
     for (auto &[a, b, c] : bingo)
     {
-        if (localBoard[a] != Player::NO_SET && localBoard[a] == localBoard[b] && localBoard[b] == localBoard[c])
+        if (local_board[a] != Player::NO_SET && local_board[a] == local_board[b] && local_board[b] == local_board[c])
         {
-            switch (localBoard[a])
+            switch (local_board[a])
             {
             case Player::PLAYER_1:
                 result = Result::PLAYER1_WIN;
@@ -88,77 +88,82 @@ LocalBoard::LocalBoard()
 */
 std::array<Player, 81> Board::Flatten()
 {
-    std::array<Player, 81> flatBoard = {};
-    for (int localNum = 0; localNum < 9; localNum++)
+    std::array<Player, 81> flat_board = {};
+    for (int local_num = 0; local_num < 9; local_num++)
     {
-        std::array<Player, 9> flatLocalBoard = localBoards[localNum].Flatten();
-        for (int localPos = 0; localPos < 9; localPos++)
+        std::array<Player, 9> flat_local_board = local_boards[local_num].Flatten();
+        for (int local_pos = 0; local_pos < 9; local_pos++)
         {
-            int pos = LocalPosToPos(localNum, localPos);
-            flatBoard[pos] = flatLocalBoard[localPos];
+            int pos = LocalPosToPos(local_num, local_pos);
+            flat_board[pos] = flat_local_board[local_pos];
         }
     }
-    return flatBoard;
+    return flat_board;
 }
 
 std::tuple<int, int> Board::PosToLocalPos(int pos)
 {
     /*boardのindexを(localboard番号, localboardのindex)に変換する*/
-    int localNum = pos / 9, localPos = pos % 9;
-    return std::make_tuple(localNum, localPos);
+    int local_num = pos / 9, local_pos = pos % 9;
+    return std::make_tuple(local_num, local_pos);
 }
 
-int LocalPosToPos(int localNum, int localPos)
+int LocalPosToPos(int local_num, int local_pos)
 {
-    int pos = localNum * 9 + localPos;
+    int pos = local_num * 9 + local_pos;
     return pos;
 }
 
 void Board::Mark(int pos, Player player)
 {
     /*posにplayerの手をマークする*/
-    auto [localNum, localPos] = PosToLocalPos(pos);
-    localBoards[localNum].Mark(localPos, player);
-    Result localResult = localBoards[localNum].CheckState();
-    if (localResult == Result::PLAYER1_WIN)
-        grobalBoard.Mark(localNum, Player::PLAYER_1);
-    else if (localResult == Result::PLAYER2_WIN)
-        grobalBoard.Mark(localNum, Player::PLAYER_2);
+    auto [local_num, local_pos] = PosToLocalPos(pos);
+    local_boards[local_num].Mark(local_pos, player);
+    Result local_result = local_boards[local_num].CheckState();
+    if (local_result == Result::PLAYER1_WIN)
+        grobal_board.Mark(local_num, Player::PLAYER_1);
+    else if (local_result == Result::PLAYER2_WIN)
+        grobal_board.Mark(local_num, Player::PLAYER_2);
 }
 
-std::array<bool, 81> Board::MakeLegalMoveMap(int lastMove)
+std::array<bool, 81> Board::MakeLegalMoveMap(int last_move)
 {
-    std::array<bool, 81> legalBoard = {};
-    if (lastMove != -1) // 1ターン目
+    std::array<bool, 81> legal_board = {};
+    if (last_move != -1) // 1ターン目
     {
         for (int pos = 0; pos < 81; pos++)
-            legalBoard[pos] = true;
-        return legalBoard;
+            legal_board[pos] = true;
+        return legal_board;
     }
-    auto [localNum, localPos] = PosToLocalPos(lastMove);
-    if (localBoards[localNum].CheckState() == Result::NO_SET) // 指定されたlocalBoardに置けるとき
+    auto [local_num, local_pos] = PosToLocalPos(last_move);
+    if (local_boards[local_num].CheckState() == Result::NO_SET) // 指定されたlocalBoardに置けるとき
     {
-        std::array<bool, 9> emptyCellMap = localBoards[localNum].MakeLegalMoveMap();
+        std::array<bool, 9> empty_cell_map = local_boards[local_num].MakeLegalMoveMap();
         for (int i = 0; i < 9; i++)
         {
-            int pos = LocalPosToPos(localNum, i);
-            legalBoard[pos] = emptyCellMap[i];
+            int pos = LocalPosToPos(local_num, i);
+            legal_board[pos] = empty_cell_map[i];
         }
-        return legalBoard;
+        return legal_board;
     }
     else // 指定されたlocalBoardに置けないとき
     {
-        for (int localNum = 0; localNum < 9; localNum++)
+        for (int local_num = 0; local_num < 9; local_num++)
         {
-            std::array<bool, 9> emptyCellMap = localBoards[localNum].MakeLegalMoveMap();
+            std::array<bool, 9> empty_cell_map = local_boards[local_num].MakeLegalMoveMap();
             for (int i = 0; i < 9; i++)
             {
-                int pos = LocalPosToPos(localNum, i);
-                legalBoard[pos] = emptyCellMap[i];
+                int pos = LocalPosToPos(local_num, i);
+                legal_board[pos] = empty_cell_map[i];
             }
         }
-        return legalBoard;
+        return legal_board;
     }
+}
+
+Result Board::CheckState()
+{
+    return grobal_board.CheckState();
 }
 
 Board::Board()

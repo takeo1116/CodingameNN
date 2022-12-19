@@ -22,7 +22,7 @@ class LocalBoard
 {
 private:
     static const std::array<std::tuple<char, char, char>, 8> bingo;
-    std::array<Player, 9> localBoard;
+    std::array<Player, 9> local_board;
     Result result;
 
 public:
@@ -37,13 +37,14 @@ public:
 class Board
 {
 private:
-    std::array<LocalBoard, 9> localBoards;
-    LocalBoard grobalBoard;
+    std::array<LocalBoard, 9> local_boards;
+    LocalBoard grobal_board;
 
 public:
     std::array<Player, 81> Flatten();
-    std::array<bool, 81> MakeLegalMoveMap(int lastMove);
+    std::array<bool, 81> MakeLegalMoveMap(int last_move);
     std::tuple<int, int> PosToLocalPos(int pos);
     void Mark(int pos, Player player);
+    Result CheckState();
     Board();
 };

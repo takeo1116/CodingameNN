@@ -11,9 +11,8 @@ private:
     std::array<AgentBase, 2> players;
     Board board;
     Record record;
-    Result gameState;
-    Player nowPlayer;
-    Player firstPlayer;
+    Player now_player;
+    Player first_player;
     Result result;
 
 public:
