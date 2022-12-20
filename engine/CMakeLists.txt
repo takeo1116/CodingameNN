@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-add_library(engine STATIC
+add_library(engine SHARED
     board.cpp
-    agent.cpp
     game.cpp
 )

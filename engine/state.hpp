@@ -58,4 +58,5 @@ public:
         this->now_player = now_player;
         this->first_player = first_player;
     }
+    State() {}
 };

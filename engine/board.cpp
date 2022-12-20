@@ -108,7 +108,7 @@ std::tuple<int, int> Board::PosToLocalPos(int pos)
     return std::make_tuple(local_num, local_pos);
 }
 
-int LocalPosToPos(int local_num, int local_pos)
+int Board::LocalPosToPos(int local_num, int local_pos)
 {
     int pos = local_num * 9 + local_pos;
     return pos;

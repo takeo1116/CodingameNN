@@ -44,6 +44,7 @@ public:
     std::array<Player, 81> Flatten();
     std::array<bool, 81> MakeLegalMoveMap(int last_move);
     std::tuple<int, int> PosToLocalPos(int pos);
+    int LocalPosToPos(int local_num, int local_pos);
     void Mark(int pos, Player player);
     Result CheckState();
     Board();

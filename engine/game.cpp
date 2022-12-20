@@ -1,23 +1,33 @@
 #include <chrono>
 #include <iostream>
+#include <string>
 #include "game.hpp"
 #include "state.hpp"
 #include "board.hpp"
 #include "action.hpp"
 
-Result Game::ProcessGame()
+template <class Agent1, class Agent2>
+Result Game<Agent1, Agent2>::ProcessGame()
 {
     /*ゲームを1手進める*/
     State now_state = State(board, now_player, first_player);
-    AgentBase &player = players[0];
-    if (now_player == Player::PLAYER_2)
-        player = players[1];
-    else if (now_player != Player::PLAYER_1)
+    Action action;
+    std::string agent_name;
+    if (now_player == Player::PLAYER_1)
+    {
+        action = player_1.RequestAction(now_state);
+        agent_name = player_1.GetAgentName();
+    }
+    else if (now_player == Player::PLAYER_2)
+    {
+        action = player_2.RequestAction(now_state);
+        agent_name = player_2.GetAgentName();
+    }
+    else
         throw std::runtime_error("error in Game::ProcessGame");
-    Action action = player.RequestAction(now_state);
 
     // 手を記録する
-    ActionData action_data = ActionData(now_player, first_player, player.GetAgentName(), now_state, action);
+    ActionData action_data = ActionData(now_player, first_player, agent_name, now_state, action);
     record.Add(action_data);
 
     // 返ってきた手が有効かどうか調べる（有効じゃない手を打とうとしたら負け）
@@ -38,7 +48,8 @@ Result Game::ProcessGame()
     return board.CheckState();
 }
 
-Record Game::Play()
+template <class Agent1, class Agent2>
+Record Game<Agent1, Agent2>::Play()
 {
     /*ゲーム終了までシミュレートする*/
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
@@ -52,4 +63,17 @@ Record Game::Play()
     int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count();
 
     std::cout << "result: " << (int)result << ", time: " << elapsed_time << " ms" << std::endl;
+    return record;
+}
+
+template <class Agent1, class Agent2>
+Game<Agent1, Agent2>::Game(Agent1 &agent_1, Agent2 &agent_2, Player first_player)
+{
+    player_1 = agent_1;
+    player_2 = agent_2;
+    board = Board();
+    record = Record();
+    first_player = first_player;
+    now_player = first_player;
+    result = Result::NO_SET;
 }
