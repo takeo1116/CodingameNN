@@ -1,3 +1,4 @@
+#include <iostream>
 #include "board.hpp"
 
 /*
@@ -101,6 +102,11 @@ std::array<Player, 81> Board::Flatten()
     return flat_board;
 }
 
+std::array<Player, 9> Board::FlattenGrobalBoard()
+{
+    return grobal_board.Flatten();
+}
+
 std::tuple<int, int> Board::PosToLocalPos(int pos)
 {
     /*boardのindexを(localboard番号, localboardのindex)に変換する*/
@@ -129,19 +135,19 @@ void Board::Mark(int pos, Player player)
 std::array<bool, 81> Board::MakeLegalMoveMap(int last_move)
 {
     std::array<bool, 81> legal_board = {};
-    if (last_move != -1) // 1ターン目
+    if (last_move == -1) // 1ターン目
     {
         for (int pos = 0; pos < 81; pos++)
             legal_board[pos] = true;
         return legal_board;
     }
-    auto [local_num, local_pos] = PosToLocalPos(last_move);
-    if (local_boards[local_num].CheckState() == Result::NO_SET) // 指定されたlocalBoardに置けるとき
+    auto [last_local_num, last_local_pos] = PosToLocalPos(last_move);
+    if (local_boards[last_local_pos].CheckState() == Result::NO_SET) // 指定されたlocalBoardに置けるとき
     {
-        std::array<bool, 9> empty_cell_map = local_boards[local_num].MakeLegalMoveMap();
+        std::array<bool, 9> empty_cell_map = local_boards[last_local_pos].MakeLegalMoveMap();
         for (int i = 0; i < 9; i++)
         {
-            int pos = LocalPosToPos(local_num, i);
+            int pos = LocalPosToPos(last_local_pos, i);
             legal_board[pos] = empty_cell_map[i];
         }
         return legal_board;

@@ -27,7 +27,7 @@ class Record
 {
 private:
     std::vector<ActionData> storage;
-    Result result;
+    Result result = Result::NO_SET;
 
 public:
     void Add(ActionData &action_data)
@@ -37,5 +37,12 @@ public:
     void SetResult(Result result)
     {
         this->result = result;
+    }
+    int GetLastAction()
+    {
+        int last_action = -1;
+        if (!storage.empty())
+            last_action = storage.back().action.GetMove();
+        return last_action;
     }
 };

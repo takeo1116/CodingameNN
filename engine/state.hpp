@@ -47,16 +47,51 @@ public:
         /*合法手のリストを得る*/
         std::vector<int> legal_positions;
         auto legal_move_map = board.MakeLegalMoveMap(last_action);
+
         for (int pos = 0; pos < 81; pos++)
             if (legal_move_map[pos])
                 legal_positions.push_back(pos);
         return legal_positions;
     }
-    State(Board board, Player now_player, Player first_player)
+
+    std::string DumpLegalPositionMap()
+    {
+        auto legal_move_map = board.MakeLegalMoveMap(last_action);
+        std::string str = "";
+        for (int pos = 0; pos < 81; pos++)
+        {
+            str += legal_move_map[pos] ? '|' : '-';
+            if (pos % 9 == 8)
+                str += " ";
+        }
+        std::cout << str << std::endl;
+        return str;
+    }
+
+    std::string DumpFlatBoard()
+    {
+        auto flat_board = board.Flatten();
+        std::string str = "";
+        for (int i = 0; i < 81; i++)
+        {
+            str += (int)flat_board[i] + '0';
+            if (i % 9 == 8)
+                str += " ";
+        }
+        str += "| ";
+        auto grobal_flat_board = board.FlattenGrobalBoard();
+        for (int i = 0; i < 9; i++)
+            str += (int)grobal_flat_board[i] + '0';
+        std::cout << str << std::endl;
+        return str;
+    }
+
+    State(Board board, Player now_player, Player first_player, int last_action)
     {
         this->board = board;
         this->now_player = now_player;
         this->first_player = first_player;
+        this->last_action = last_action;
     }
     State() {}
 };

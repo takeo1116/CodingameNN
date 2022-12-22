@@ -22,8 +22,8 @@ class LocalBoard
 {
 private:
     static const std::array<std::tuple<char, char, char>, 8> bingo;
-    std::array<Player, 9> local_board;
-    Result result;
+    std::array<Player, 9> local_board = {};
+    Result result = Result::NO_SET;
 
 public:
     std::array<Player, 9> Flatten();
@@ -42,6 +42,7 @@ private:
 
 public:
     std::array<Player, 81> Flatten();
+    std::array<Player, 9> FlattenGrobalBoard();
     std::array<bool, 81> MakeLegalMoveMap(int last_move);
     std::tuple<int, int> PosToLocalPos(int pos);
     int LocalPosToPos(int local_num, int local_pos);

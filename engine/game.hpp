@@ -24,7 +24,7 @@ public:
     Result ProcessGame()
     {
         /*ゲームを1手進める*/
-        State now_state = State(board, now_player, first_player);
+        State now_state = State(board, now_player, first_player, record.GetLastAction());
         Action action;
         std::string agent_name;
         if (now_player == Player::PLAYER_1)
@@ -39,8 +39,6 @@ public:
         }
         else
             throw std::runtime_error("error in Game::ProcessGame");
-
-        std::cout << action.GetMove() << std::endl;
         
         // 手を記録する
         ActionData action_data = ActionData(now_player, first_player, agent_name, now_state, action);
@@ -60,6 +58,17 @@ public:
 
         // 手を反映させる
         board.Mark(action.GetMove(), now_player);
+
+        //dump
+        now_state.DumpLegalPositionMap();
+        now_state.DumpFlatBoard();
+        std::cout << action.GetMove() << std::endl;
+
+        // 手番を移す
+        if (now_player == Player::PLAYER_1)
+            now_player = Player::PLAYER_2;
+        else if (now_player == Player::PLAYER_2)
+            now_player = Player::PLAYER_1;
 
         return board.CheckState();
     }
