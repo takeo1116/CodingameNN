@@ -7,6 +7,7 @@ enum class Player
     NO_SET,
     PLAYER_1,
     PLAYER_2,
+    NO_ONE,
 };
 
 enum class Result
@@ -32,6 +33,7 @@ public:
     void Mark(int pos, Player player);
     Result CheckState();
     LocalBoard();
+    LocalBoard(std::array<Player, 9> flat_board);
 };
 
 class Board
@@ -49,4 +51,5 @@ public:
     void Mark(int pos, Player player);
     Result CheckState();
     Board();
+    Board(std::array<Player, 81> flat_board);
 };

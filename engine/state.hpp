@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <array>
 #include <vector>
 #include "board.hpp"
@@ -8,7 +9,20 @@ enum class Cell
     NO_SET,
     ME,
     OPPONENT,
+    NO_ONE,
 };
+
+Cell ToOpponentCell(Cell cell)
+{
+    if (cell == Cell::ME)
+        return Cell::OPPONENT;
+    else if (cell == Cell::OPPONENT)
+        return Cell::ME;
+    else if (cell == Cell::NO_ONE)
+        return Cell::NO_ONE;
+    else
+        throw std::runtime_error("error in ToOpponentCell()");
+}
 
 class State
 {
@@ -19,7 +33,19 @@ private:
     int last_action;
 
 public:
-    std::array<Cell, 81> makeFlatBoard()
+    Player GetPlayer()
+    {
+        return now_player;
+    }
+    Player GetFirstPlayer()
+    {
+        return first_player;
+    }
+    std::array<Player, 81> GetPlayerBoard()
+    {
+        return board.Flatten();
+    }
+    std::array<Cell, 81> MakeFlatBoard()
     {
         /*盤面を表すarrayを得る*/
         std::array<Cell, 81> flat_cell_board = {};

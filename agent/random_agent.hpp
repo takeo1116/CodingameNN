@@ -12,9 +12,9 @@ public:
     {
         auto legal_positions = state.GetLegalPositions();
         int index = random() % legal_positions.size();
-        return legal_positions[index];
+        return Action(legal_positions[index]);
     }
-    std::string GetAgentName()
+    std::string GetAgentName() override
     {
         return "RandomAgent";
     }

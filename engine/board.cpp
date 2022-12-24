@@ -35,7 +35,7 @@ std::array<bool, 9> LocalBoard::MakeLegalMoveMap()
 bool LocalBoard::IsFull()
 {
     /*local_boardがすべて埋まっているか？*/
-    for (auto a : local_board)
+    for (Player a : local_board)
         if (a == Player::NO_SET)
             return false;
     return true;
@@ -44,6 +44,9 @@ bool LocalBoard::IsFull()
 void LocalBoard::Mark(int pos, Player player)
 {
     /*posにplayerの手をマークする*/
+    if (local_board[pos] != Player::NO_SET)
+        throw std::runtime_error("the cell is already marked");
+
     local_board[pos] = player;
 }
 
@@ -82,6 +85,11 @@ Result LocalBoard::CheckState()
 
 LocalBoard::LocalBoard()
 {
+}
+
+LocalBoard::LocalBoard(std::array<Player, 9> flat_board)
+{
+    local_board = flat_board;
 }
 
 /*
@@ -130,6 +138,8 @@ void Board::Mark(int pos, Player player)
         grobal_board.Mark(local_num, Player::PLAYER_1);
     else if (local_result == Result::PLAYER2_WIN)
         grobal_board.Mark(local_num, Player::PLAYER_2);
+    else if (local_result == Result::DRAW)
+        grobal_board.Mark(local_num, Player::NO_ONE);
 }
 
 std::array<bool, 81> Board::MakeLegalMoveMap(int last_move)
@@ -174,4 +184,28 @@ Result Board::CheckState()
 
 Board::Board()
 {
+}
+
+Board::Board(std::array<Player, 81> flat_board)
+{
+    for (int local_num = 0; local_num < 9; local_num++)
+    {
+        std::array<Player, 9> local_board = {};
+        for (int local_pos = 0; local_pos < 9; local_pos++)
+        {
+            int pos = LocalPosToPos(local_num, local_pos);
+            local_board[local_pos] = flat_board[pos];
+        }
+        local_boards[local_num] = LocalBoard(local_board);
+    }
+    for (int grobal_pos = 0; grobal_pos < 9; grobal_pos++)
+    {
+        Result local_result = local_boards[grobal_pos].CheckState();
+        if (local_result == Result::PLAYER1_WIN)
+            grobal_board.Mark(grobal_pos, Player::PLAYER_1);
+        else if (local_result == Result::PLAYER2_WIN)
+            grobal_board.Mark(grobal_pos, Player::PLAYER_2);
+        else if (local_result == Result::DRAW)
+            grobal_board.Mark(grobal_pos, Player::NO_ONE);
+    }
 }
