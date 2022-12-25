@@ -7,16 +7,54 @@
 class ActionData
 {
 public:
-    Player now_player;
-    Player first_player;
     std::string agent_name;
     State state;
     Action action;
 
-    ActionData(Player now_player, Player first_player, std::string agent_name, State state, Action action)
+    std::string Dump(Result result)
     {
-        this->now_player = now_player;
-        this->first_player = first_player;
+        std::string str = "{";
+        str += "is_first:" + std::to_string(state.IsFirstPlayer()) + ",";
+        str += "agent_name:" + agent_name + ",";
+        str += "flat_board:[";
+        for (Cell cell : state.MakeFlatBoard())
+        {
+            if (cell == Cell::NO_SET)
+                str += "0,";
+            else if (cell == Cell::ME)
+                str += "1,";
+            else if (cell == Cell::OPPONENT)
+                str += "2,";
+            else
+                throw std::runtime_error("in Action::Dump()");
+        }
+        str.pop_back();
+        str += "],";
+        str += "legal_moves:[";
+        for (int a : state.GetLegalPositions())
+            str += std::to_string(a) + ",";
+        str.pop_back();
+        str += "],";
+        str += "move:" + std::to_string(action.GetMove()) + ",";
+        str += "result_value:";
+        if ((state.GetPlayer() == Player::PLAYER_1 && result == Result::PLAYER1_WIN) || (state.GetPlayer() == Player::PLAYER_2 && result == Result::PLAYER2_WIN))
+            str += "1.0,";
+        else if ((state.GetPlayer() == Player::PLAYER_1 && result == Result::PLAYER2_WIN) || (state.GetPlayer() == Player::PLAYER_2 && result == Result::PLAYER1_WIN))
+            str += "-1.0,";
+        else
+            str += "0.0,";
+        str += "state_value:" + std::to_string(action.GetStateValue()) + ",";
+        str += "action_values:[";
+        for (float a : action.GetActionValues())
+            str += std::to_string(a) + ",";
+        str.pop_back();
+        str += "]";
+        str += "}";
+
+        return str;
+    }
+    ActionData(std::string agent_name, State state, Action action)
+    {
         this->agent_name = agent_name;
         this->state = state;
         this->action = action;
@@ -37,6 +75,16 @@ public:
     void SetResult(Result result)
     {
         this->result = result;
+    }
+    void Dump()
+    {
+        std::vector<std::string> strings;
+        for (auto &actiondata : storage)
+        {
+            std::string str = actiondata.Dump(result);
+            strings.push_back(str);
+            std::cout << str << std::endl;
+        }
     }
     int GetLastAction()
     {

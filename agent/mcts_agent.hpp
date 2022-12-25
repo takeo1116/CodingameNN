@@ -169,28 +169,37 @@ public:
         }
 
         int move = -1;
-        float max_value = -FLT_MAX;
+        int max_visitednum = -INT32_MAX;
+        float max_winrate = -FLT_MAX;
+        std::array<float, 81> action_values = {};
         for (auto &[pos, next_statedata] : root_statedata->next_statedata)
         {
-            float value = next_statedata->GetWinRate();
-            // float value = next_statedata->GetVisitedNum();
-            std::cout << pos << ": " << next_statedata->GetVisitedNum() << ", " << value << std::endl;
-            if (max_value < value)
+            float winrate = next_statedata->GetWinRate();
+            int visitednum = next_statedata->GetVisitedNum();
+            action_values[pos] = visitednum;
+            std::cout << pos << ": " << visitednum << ", " << winrate << std::endl;
+            if (max_visitednum < visitednum)
             {
                 move = pos;
-                max_value = value;
+                max_visitednum = visitednum;
+            }
+            if (max_winrate < winrate)
+            {
+                max_winrate = winrate;
             }
         }
+        float state_value = max_winrate * 2.0f - 1.0f;
+        for (int pos = 0; pos < 81; pos++)
+            action_values[pos] /= playout;
 
         for (auto &[pos, next_statedata] : root_statedata->next_statedata[move]->next_statedata)
         {
-            float value = next_statedata->GetWinRate();
-            // float value = next_statedata->GetVisitedNum();
-            std::cout << "-" << pos << ": " << next_statedata->GetVisitedNum() << ", " << value << std::endl;
+            float winrate = next_statedata->GetWinRate();
+            int visitednum = next_statedata->GetVisitedNum();
+            std::cout << "-" << pos << ": " << visitednum << ", " << winrate << std::endl;
         }
 
-        // throw std::runtime_error("test");
-        return Action(move);
+        return Action(move, state_value, action_values);
     }
     std::string GetAgentName() override
     {

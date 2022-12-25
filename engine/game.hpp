@@ -41,7 +41,7 @@ public:
             throw std::runtime_error("error in Game::ProcessGame");
         
         // 手を記録する
-        ActionData action_data = ActionData(now_player, first_player, agent_name, now_state, action);
+        ActionData action_data = ActionData(agent_name, now_state, action);
         record.Add(action_data);
 
         // 返ってきた手が有効かどうか調べる（有効じゃない手を打とうとしたら負け）
@@ -86,6 +86,7 @@ public:
         int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count();
 
         std::cout << "result: " << (int)result << ", time: " << elapsed_time << " ms" << std::endl;
+        record.Dump();
         return record;
     }
     Game(std::shared_ptr<Agent1> agent_1, std::shared_ptr<Agent2> agent_2, Player first_player)

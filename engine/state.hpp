@@ -41,6 +41,10 @@ public:
     {
         return first_player;
     }
+    bool IsFirstPlayer()
+    {
+        return now_player == first_player;
+    }
     std::array<Player, 81> GetPlayerBoard()
     {
         return board.Flatten();
