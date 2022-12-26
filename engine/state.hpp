@@ -31,8 +31,13 @@ private:
     Player now_player;
     Player first_player;
     int last_action;
+    int turn;
 
 public:
+    int GetTurn()
+    {
+        return turn;
+    }
     Player GetPlayer()
     {
         return now_player;
@@ -116,12 +121,13 @@ public:
         return str;
     }
 
-    State(Board board, Player now_player, Player first_player, int last_action)
+    State(Board board, Player now_player, Player first_player, int last_action, int turn)
     {
         this->board = board;
         this->now_player = now_player;
         this->first_player = first_player;
         this->last_action = last_action;
+        this->turn = turn;
     }
     State() {}
 };

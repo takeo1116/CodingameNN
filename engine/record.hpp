@@ -3,6 +3,7 @@
 #include <vector>
 #include "action.hpp"
 #include "state.hpp"
+#include "../nlohmann/json.hpp"
 
 class ActionData
 {
@@ -10,48 +11,29 @@ public:
     std::string agent_name;
     State state;
     Action action;
-
+    float GetResultValue(Result result)
+    {
+        if ((state.GetPlayer() == Player::PLAYER_1 && result == Result::PLAYER1_WIN) || (state.GetPlayer() == Player::PLAYER_2 && result == Result::PLAYER2_WIN))
+            return 1.0f;
+        else if ((state.GetPlayer() == Player::PLAYER_1 && result == Result::PLAYER2_WIN) || (state.GetPlayer() == Player::PLAYER_2 && result == Result::PLAYER1_WIN))
+            return -1.0f;
+        else
+            return 0.0f;
+    }
     std::string Dump(Result result)
     {
-        std::string str = "{";
-        str += "is_first:" + std::to_string(state.IsFirstPlayer()) + ",";
-        str += "agent_name:" + agent_name + ",";
-        str += "flat_board:[";
-        for (Cell cell : state.MakeFlatBoard())
-        {
-            if (cell == Cell::NO_SET)
-                str += "0,";
-            else if (cell == Cell::ME)
-                str += "1,";
-            else if (cell == Cell::OPPONENT)
-                str += "2,";
-            else
-                throw std::runtime_error("in Action::Dump()");
-        }
-        str.pop_back();
-        str += "],";
-        str += "legal_moves:[";
-        for (int a : state.GetLegalPositions())
-            str += std::to_string(a) + ",";
-        str.pop_back();
-        str += "],";
-        str += "move:" + std::to_string(action.GetMove()) + ",";
-        str += "result_value:";
-        if ((state.GetPlayer() == Player::PLAYER_1 && result == Result::PLAYER1_WIN) || (state.GetPlayer() == Player::PLAYER_2 && result == Result::PLAYER2_WIN))
-            str += "1.0,";
-        else if ((state.GetPlayer() == Player::PLAYER_1 && result == Result::PLAYER2_WIN) || (state.GetPlayer() == Player::PLAYER_2 && result == Result::PLAYER1_WIN))
-            str += "-1.0,";
-        else
-            str += "0.0,";
-        str += "state_value:" + std::to_string(action.GetStateValue()) + ",";
-        str += "action_values:[";
-        for (float a : action.GetActionValues())
-            str += std::to_string(a) + ",";
-        str.pop_back();
-        str += "]";
-        str += "}";
+        nlohmann::json json = {
+            {"is_first", state.IsFirstPlayer()},
+            {"agent_name", agent_name},
+            {"flat_board", state.MakeFlatBoard()},
+            {"legal_moves", state.GetLegalPositions()},
+            {"move", action.GetMove()},
+            {"result_value", GetResultValue(result)},
+            {"state_value", action.GetStateValue()},
+            {"action_values", action.GetActionValues()},
+        };
 
-        return str;
+        return json.dump();
     }
     ActionData(std::string agent_name, State state, Action action)
     {
@@ -76,14 +58,18 @@ public:
     {
         this->result = result;
     }
-    void Dump()
+    void Dump(std::string output_path = "none")
     {
-        std::vector<std::string> strings;
         for (auto &actiondata : storage)
         {
             std::string str = actiondata.Dump(result);
-            strings.push_back(str);
             std::cout << str << std::endl;
+
+            if (output_path != "none")
+            {
+                std::ofstream ofs(output_path, std::ios::app);
+                ofs << str << std::endl;
+            }
         }
     }
     int GetLastAction()

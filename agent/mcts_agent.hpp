@@ -121,6 +121,19 @@ private:
         return move;
     }
 
+    int SelectMove(std::array<int, 81> visitednums)
+    {
+        /*各手の到達回数を重みとして手を決める*/
+        long long r = random() % playout;
+        for (int pos = 0; pos < 81; pos++)
+        {
+            r -= visitednums[pos];
+            if (r < 0)
+                return pos;
+        }
+        return -1;
+    }
+
 public:
     Action RequestAction(State root_state) override
     {
@@ -139,7 +152,7 @@ public:
 
             while (result == Result::NO_SET)
             {
-                State now_state = State(board, now_player, root_state.GetFirstPlayer(), last_action);
+                State now_state = State(board, now_player, root_state.GetFirstPlayer(), last_action, -1);
                 int move = SimulateAction(now_state, now_statedata);
                 // std::cout << "move: " << move << std::endl;
                 if (now_statedata != nullptr && now_statedata->IsExpanded())
@@ -168,19 +181,19 @@ public:
                 last_statedata->BackPropagation(Cell::OPPONENT); // 負け
         }
 
-        int move = -1;
+        int best_move = -1;
         int max_visitednum = -INT32_MAX;
         float max_winrate = -FLT_MAX;
-        std::array<float, 81> action_values = {};
+        std::array<int, 81> visitednums = {};
         for (auto &[pos, next_statedata] : root_statedata->next_statedata)
         {
             float winrate = next_statedata->GetWinRate();
             int visitednum = next_statedata->GetVisitedNum();
-            action_values[pos] = visitednum;
-            std::cout << pos << ": " << visitednum << ", " << winrate << std::endl;
+            visitednums[pos] = visitednum;
+            // std::cout << pos << ": " << visitednum << ", " << winrate << std::endl;
             if (max_visitednum < visitednum)
             {
-                move = pos;
+                best_move = pos;
                 max_visitednum = visitednum;
             }
             if (max_winrate < winrate)
@@ -188,18 +201,30 @@ public:
                 max_winrate = winrate;
             }
         }
-        float state_value = max_winrate * 2.0f - 1.0f;
-        for (int pos = 0; pos < 81; pos++)
-            action_values[pos] /= playout;
+        int rand_move = SelectMove(visitednums);
 
-        for (auto &[pos, next_statedata] : root_statedata->next_statedata[move]->next_statedata)
+        float state_value = max_winrate * 2.0f - 1.0f;
+
+        std::array<float, 81> action_values = {};
+        for (int pos = 0; pos < 81; pos++)
+            action_values[pos] = (float)visitednums[pos] / playout;
+
+        for (auto &[pos, next_statedata] : root_statedata->next_statedata[best_move]->next_statedata)
         {
             float winrate = next_statedata->GetWinRate();
             int visitednum = next_statedata->GetVisitedNum();
-            std::cout << "-" << pos << ": " << visitednum << ", " << winrate << std::endl;
+            // std::cout << "-" << pos << ": " << visitednum << ", " << winrate << std::endl;
         }
-
-        return Action(move, state_value, action_values);
+        if (root_state.GetTurn() < 10)
+        {
+            // std::cout << "rand_move: " << rand_move << std::endl;
+            return Action(rand_move, state_value, action_values);
+        }
+        else
+        {
+            // std::cout << "best_move: " << best_move << std::endl;
+            return Action(rand_move, state_value, action_values);
+        }
     }
     std::string GetAgentName() override
     {

@@ -4,6 +4,7 @@
 #include <vector>
 #include <chrono>
 #include <memory>
+#include <fstream>
 #include "agent.hpp"
 #include "board.hpp"
 #include "record.hpp"
@@ -19,12 +20,13 @@ private:
     Player now_player;
     Player first_player;
     Result result;
+    int turn = 0;
 
 public:
     Result ProcessGame()
     {
         /*ゲームを1手進める*/
-        State now_state = State(board, now_player, first_player, record.GetLastAction());
+        State now_state = State(board, now_player, first_player, record.GetLastAction(), turn);
         Action action;
         std::string agent_name;
         if (now_player == Player::PLAYER_1)
@@ -39,13 +41,17 @@ public:
         }
         else
             throw std::runtime_error("error in Game::ProcessGame");
-        
+
+        turn++;
+
         // 手を記録する
         ActionData action_data = ActionData(agent_name, now_state, action);
         record.Add(action_data);
 
-        // 返ってきた手が有効かどうか調べる（有効じゃない手を打とうとしたら負け）
-        if (!now_state.IsLegal(action.GetMove()))
+        if (action.GetMove() == -1) // -1なら例外を出す（本来は負けだが、バグ発見のための措置）
+            throw std::runtime_error("Game get -1 move");
+
+        if (!now_state.IsLegal(action.GetMove())) // 返ってきた手が有効かどうか調べる（有効じゃない手を打とうとしたら負け）
         {
             if (now_player == Player::PLAYER_1)
                 result = Result::PLAYER2_WIN;
@@ -59,10 +65,10 @@ public:
         // 手を反映させる
         board.Mark(action.GetMove(), now_player);
 
-        //dump
-        now_state.DumpLegalPositionMap();
-        now_state.DumpFlatBoard();
-        std::cout << action.GetMove() << std::endl;
+        // dump
+        // now_state.DumpLegalPositionMap();
+        // now_state.DumpFlatBoard();
+        // std::cout << action.GetMove() << std::endl;
 
         // 手番を移す
         if (now_player == Player::PLAYER_1)
@@ -88,6 +94,11 @@ public:
         std::cout << "result: " << (int)result << ", time: " << elapsed_time << " ms" << std::endl;
         record.Dump();
         return record;
+    }
+    void Dump(std::string output_path = "none")
+    {
+        record.Dump(output_path);
+        return;
     }
     Game(std::shared_ptr<Agent1> agent_1, std::shared_ptr<Agent2> agent_2, Player first_player)
     {
