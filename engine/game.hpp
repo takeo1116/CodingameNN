@@ -92,7 +92,6 @@ public:
         int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count();
 
         std::cout << "result: " << (int)result << ", time: " << elapsed_time << " ms" << std::endl;
-        record.Dump();
         return record;
     }
     void Dump(std::string output_path = "none")

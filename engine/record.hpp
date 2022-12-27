@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <fstream>
 #include "action.hpp"
 #include "state.hpp"
 #include "../nlohmann/json.hpp"
@@ -58,14 +59,13 @@ public:
     {
         this->result = result;
     }
-    void Dump(std::string output_path = "none")
+    void Dump(std::string output_path = "NO_SET")
     {
         for (auto &actiondata : storage)
         {
             std::string str = actiondata.Dump(result);
-            std::cout << str << std::endl;
-
-            if (output_path != "none")
+            // std::cout << str << std::endl;
+            if (output_path != "NO_SET")
             {
                 std::ofstream ofs(output_path, std::ios::app);
                 ofs << str << std::endl;

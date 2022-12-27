@@ -7,17 +7,15 @@
 
 int main(int argc, char *argv[])
 {
-    std::shared_ptr<RandomAgent> random_agent(new RandomAgent());
-    std::shared_ptr<MctsAgent> mcts_agent_100000(new MctsAgent(1000));
+    std::shared_ptr<MctsAgent> mcts_agent_100000(new MctsAgent(100000));
     while (true)
     {
         std::string filepath = argv[1];
-        std::ofstream ofs(filepath);
         for (int i = 0; i < 1; i++)
         {
             Game<MctsAgent, MctsAgent> game(mcts_agent_100000, mcts_agent_100000, Player::PLAYER_1);
             game.Play();
-            game.Dump();
+            game.Dump(filepath);
         }
     }
 
