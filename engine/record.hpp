@@ -4,7 +4,7 @@
 #include <fstream>
 #include "action.hpp"
 #include "state.hpp"
-#include "../nlohmann/json.hpp"
+#include "../learn/learndata.hpp"
 
 class ActionData
 {
@@ -23,18 +23,9 @@ public:
     }
     std::string Dump(Result result)
     {
-        nlohmann::json json = {
-            {"is_first", state.IsFirstPlayer()},
-            {"agent_name", agent_name},
-            {"flat_board", state.MakeFlatBoard()},
-            {"legal_moves", state.GetLegalPositions()},
-            {"move", action.GetMove()},
-            {"result_value", GetResultValue(result)},
-            {"state_value", action.GetStateValue()},
-            {"action_values", action.GetActionValues()},
-        };
+        LearnData learndata(state.MakeFlatBoard(), state.GetLegalPositions(), state.MakeFlatGrobalBoard(), state.IsFirstPlayer(), agent_name, action.GetMove(), action.GetStateValue(), action.GetActionValues(), GetResultValue(result));
 
-        return json.dump();
+        return learndata.GetJsonString();
     }
     ActionData(std::string agent_name, State state, Action action)
     {

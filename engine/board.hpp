@@ -22,11 +22,11 @@ enum class Result
 class LocalBoard
 {
 private:
-    static const std::array<std::tuple<char, char, char>, 8> bingo;
     std::array<Player, 9> local_board = {};
     Result result = Result::NO_SET;
 
 public:
+    static const std::array<std::tuple<char, char, char>, 8> bingo;
     std::array<Player, 9> Flatten();
     std::array<bool, 9> MakeLegalMoveMap();
     bool IsFull();

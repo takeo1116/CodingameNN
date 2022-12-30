@@ -3,26 +3,7 @@
 #include <array>
 #include <vector>
 #include "board.hpp"
-
-enum class Cell
-{
-    NO_SET,
-    ME,
-    OPPONENT,
-    NO_ONE,
-};
-
-Cell ToOpponentCell(Cell cell)
-{
-    if (cell == Cell::ME)
-        return Cell::OPPONENT;
-    else if (cell == Cell::OPPONENT)
-        return Cell::ME;
-    else if (cell == Cell::NO_ONE)
-        return Cell::NO_ONE;
-    else
-        throw std::runtime_error("error in ToOpponentCell()");
-}
+#include "cell.hpp"
 
 class State
 {
@@ -67,6 +48,25 @@ public:
                 flat_cell_board[pos] = Cell::ME;
             else
                 flat_cell_board[pos] = Cell::OPPONENT;
+        }
+        return flat_cell_board;
+    }
+    std::array<Cell, 9> MakeFlatGrobalBoard()
+    {
+        /*GrobalBoardを表すarrayを得る*/
+        std::array<Cell, 9> flat_cell_board = {};
+        std::array<Player, 9> flat_player_board = board.FlattenGrobalBoard();
+        for (int pos = 0; pos < 9; pos++)
+        {
+            if (flat_player_board[pos] == Player::NO_SET)
+                flat_cell_board[pos] = Cell::NO_SET;
+            else if (flat_player_board[pos] == Player::NO_ONE)
+                flat_cell_board[pos] = Cell::NO_ONE;
+            else if (flat_player_board[pos] == now_player)
+                flat_cell_board[pos] = Cell::ME;
+            else
+                flat_cell_board[pos] = Cell::OPPONENT;
+            
         }
         return flat_cell_board;
     }

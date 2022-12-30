@@ -1,8 +1,13 @@
 #!/bin/sh
 
-THREAD_NUM=$1
+OUT_NAME=$1
+THREAD_NUM=$2
 EXE_FILE="./build/a.out"
-OUT_DIR="./records"
+OUT_DIR="./records/${OUT_NAME}"
+
+if [ ! -d "./records" ]; then
+    mkdir "./records"
+fi
 
 if [ ! -d $OUT_DIR ]; then
     mkdir $OUT_DIR

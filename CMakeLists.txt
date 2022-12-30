@@ -6,4 +6,6 @@ project(UTTTLearning CXX)
 add_executable(a.out
     main.cpp
     engine/board.cpp
+    engine/cell.cpp
+    learn/learndata.cpp
 )

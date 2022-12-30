@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    std::shared_ptr<MctsAgent> mcts_agent_100000(new MctsAgent(1000));
+    std::shared_ptr<MctsAgent> mcts_agent_100000(new MctsAgent(100000));
     for (int j = 0; j < 100; j++)
     {
         std::string filepath = argv[1];
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
         {
             Game<MctsAgent, MctsAgent> game(mcts_agent_100000, mcts_agent_100000, Player::PLAYER_1);
             game.Play();
-            // game.Dump(filepath);
+            game.Dump(filepath);
         }
     }
 
