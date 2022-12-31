@@ -2,3 +2,4 @@
 build/
 nlohmann/
 # records/
+nohup.out
