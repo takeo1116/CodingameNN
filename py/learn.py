@@ -31,7 +31,7 @@ values = torch.Tensor(values).to(device)
 
 dataset = TensorDataset(features, values)
 
-dataloader = DataLoader(dataset, 10, shuffle=True)
+dataloader = DataLoader(dataset, 1000, shuffle=True)
 
 model = PVNetwork().to(device)
 
@@ -45,6 +45,7 @@ for feature_tensor, value_tensor in dataloader:
     loss.backward()
     optimizer.step()
 
+    torch.set_printoptions(sci_mode=False)
     print("---")
     print(f"pv: {pv}")
     print(f"target: {value_tensor}")

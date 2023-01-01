@@ -72,4 +72,3 @@ class Features:
         values.append(state_value)
 
         return features, values
-        # return torch.Tensor(features), torch.Tensor(values)

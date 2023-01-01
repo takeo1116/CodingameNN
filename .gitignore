@@ -3,3 +3,4 @@ build/
 nlohmann/
 # records/
 nohup.out
+__pycache__/

@@ -15,6 +15,7 @@ public:
     static std::array<std::bitset<16>, 192> MakeFeatures(LearnData learndata);
     static std::string GetPythonInverseIdxes();
     static std::string GetPythonIdxes();
+    static std::string GetPythonOutMatrix();
     static std::string Dump(LearnData learndata);
 };
 
@@ -392,6 +393,54 @@ std::string Features::GetPythonIdxes()
     idxes_py.pop_back();
     idxes_py += "]";
     return idxes_py;
+}
+
+std::string Features::GetPythonOutMatrix()
+{
+    std::string matrix_py = "out_mat = torch.sparse_coo_tensor(";
+    std::string idxes_a = "[";
+    std::string idxes_b = "[";
+    std::string values = "[";
+
+    std::array<std::vector<int>, 82> idxes_inv = {};
+
+    for (int i = 0; i < idxes.size(); i++)
+    {
+        auto &[g0, g1, g2, gf, l0, l1, l2, m] = idxes[i];
+
+        short pos0 = Board::LocalPosToPos(gf, l0);
+        short pos1 = Board::LocalPosToPos(gf, l1);
+        short pos2 = Board::LocalPosToPos(gf, l2);
+
+        // ローカル
+        idxes_inv[pos0].push_back(i * 5 + 0);
+        idxes_inv[pos1].push_back(i * 5 + 1);
+        idxes_inv[pos2].push_back(i * 5 + 2);
+        for (int l = 0; l < 9; l++)
+            idxes_inv[Board::LocalPosToPos(gf, l)].push_back(i * 5 + 3);
+        // value
+        idxes_inv[81].push_back(i * 5 + 4);
+    }
+
+    for (int pos = 0; pos < 82; pos++)
+    {
+        for (int idx : idxes_inv[pos])
+        {
+            idxes_a += std::to_string(idx) + ",";
+            idxes_b += std::to_string(pos) + ",";
+            values += "1.0,";
+        }
+    }
+    idxes_a.pop_back();
+    idxes_a += "]";
+    idxes_b.pop_back();
+    idxes_b += "]";
+    values.pop_back();
+    values += "]";
+
+    matrix_py += "[" + idxes_a + "," + idxes_b + "]," + values + ", (960, 82)).to_dense()";
+
+    return matrix_py;
 }
 
 // std::string Features::Dump(LearnData learndata)

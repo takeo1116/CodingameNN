@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     //     }
     // }
 
-    std::cout << Features::GetPythonInverseIdxes() << std::endl;
+    std::cout << Features::GetPythonOutMatrix() << std::endl;
 
     return 0;
 }
