@@ -23,7 +23,7 @@ public:
     }
     std::string Dump(Result result)
     {
-        LearnData learndata(state.MakeFlatBoard(), state.GetLegalPositions(), state.MakeFlatGrobalBoard(), state.IsFirstPlayer(), agent_name, action.GetMove(), action.GetStateValue(), action.GetActionValues(), GetResultValue(result));
+        LearnData learndata(state.MakeFlatBoard(), state.GetLegalPositions(), state.MakeFlatGlobalBoard(), state.IsFirstPlayer(), agent_name, action.GetMove(), action.GetStateValue(), action.GetActionValues(), GetResultValue(result));
 
         return learndata.GetJsonString();
     }

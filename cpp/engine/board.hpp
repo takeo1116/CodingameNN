@@ -40,11 +40,11 @@ class Board
 {
 private:
     std::array<LocalBoard, 9> local_boards;
-    LocalBoard grobal_board;
+    LocalBoard global_board;
 
 public:
     std::array<Player, 81> Flatten();
-    std::array<Player, 9> FlattenGrobalBoard();
+    std::array<Player, 9> FlattenGlobalBoard();
     std::array<bool, 81> MakeLegalMoveMap(int last_move);
     static std::tuple<int, int> PosToLocalPos(int pos);
     static int LocalPosToPos(int local_num, int local_pos);

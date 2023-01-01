@@ -110,9 +110,9 @@ std::array<Player, 81> Board::Flatten()
     return flat_board;
 }
 
-std::array<Player, 9> Board::FlattenGrobalBoard()
+std::array<Player, 9> Board::FlattenGlobalBoard()
 {
-    return grobal_board.Flatten();
+    return global_board.Flatten();
 }
 
 std::tuple<int, int> Board::PosToLocalPos(int pos)
@@ -135,11 +135,11 @@ void Board::Mark(int pos, Player player)
     local_boards[local_num].Mark(local_pos, player);
     Result local_result = local_boards[local_num].CheckState();
     if (local_result == Result::PLAYER1_WIN)
-        grobal_board.Mark(local_num, Player::PLAYER_1);
+        global_board.Mark(local_num, Player::PLAYER_1);
     else if (local_result == Result::PLAYER2_WIN)
-        grobal_board.Mark(local_num, Player::PLAYER_2);
+        global_board.Mark(local_num, Player::PLAYER_2);
     else if (local_result == Result::DRAW)
-        grobal_board.Mark(local_num, Player::NO_ONE);
+        global_board.Mark(local_num, Player::NO_ONE);
 }
 
 std::array<bool, 81> Board::MakeLegalMoveMap(int last_move)
@@ -179,7 +179,7 @@ std::array<bool, 81> Board::MakeLegalMoveMap(int last_move)
 
 Result Board::CheckState()
 {
-    return grobal_board.CheckState();
+    return global_board.CheckState();
 }
 
 Board::Board()
@@ -198,14 +198,14 @@ Board::Board(std::array<Player, 81> flat_board)
         }
         local_boards[local_num] = LocalBoard(local_board);
     }
-    for (int grobal_pos = 0; grobal_pos < 9; grobal_pos++)
+    for (int global_pos = 0; global_pos < 9; global_pos++)
     {
-        Result local_result = local_boards[grobal_pos].CheckState();
+        Result local_result = local_boards[global_pos].CheckState();
         if (local_result == Result::PLAYER1_WIN)
-            grobal_board.Mark(grobal_pos, Player::PLAYER_1);
+            global_board.Mark(global_pos, Player::PLAYER_1);
         else if (local_result == Result::PLAYER2_WIN)
-            grobal_board.Mark(grobal_pos, Player::PLAYER_2);
+            global_board.Mark(global_pos, Player::PLAYER_2);
         else if (local_result == Result::DRAW)
-            grobal_board.Mark(grobal_pos, Player::NO_ONE);
+            global_board.Mark(global_pos, Player::NO_ONE);
     }
 }

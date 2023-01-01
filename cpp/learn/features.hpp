@@ -273,28 +273,28 @@ std::array<std::bitset<16>, 192> Features::MakeFeatures(LearnData learndata)
         short pos1 = Board::LocalPosToPos(gf, l1);
         short pos2 = Board::LocalPosToPos(gf, l2);
 
-        if (learndata.grobal_board[g0] == Cell::ME)
+        if (learndata.global_board[g0] == Cell::ME)
             feature |= 1 << 0;
-        else if (learndata.grobal_board[g0] == Cell::OPPONENT)
+        else if (learndata.global_board[g0] == Cell::OPPONENT)
             feature |= 1 << 1;
-        else if (learndata.grobal_board[g0] == Cell::NO_ONE)
+        else if (learndata.global_board[g0] == Cell::NO_ONE)
             feature |= 1 << 2;
 
-        if (learndata.grobal_board[g1] == Cell::ME)
+        if (learndata.global_board[g1] == Cell::ME)
             feature |= 1 << 3;
-        else if (learndata.grobal_board[g1] == Cell::OPPONENT)
+        else if (learndata.global_board[g1] == Cell::OPPONENT)
             feature |= 1 << 4;
-        else if (learndata.grobal_board[g1] == Cell::NO_ONE)
+        else if (learndata.global_board[g1] == Cell::NO_ONE)
             feature |= 1 << 5;
 
-        if (learndata.grobal_board[g2] == Cell::ME)
+        if (learndata.global_board[g2] == Cell::ME)
             feature |= 1 << 6;
-        else if (learndata.grobal_board[g2] == Cell::OPPONENT)
+        else if (learndata.global_board[g2] == Cell::OPPONENT)
             feature |= 1 << 7;
-        else if (learndata.grobal_board[g2] == Cell::NO_ONE)
+        else if (learndata.global_board[g2] == Cell::NO_ONE)
             feature |= 1 << 8;
 
-        if (learndata.grobal_board[gf] == Cell::NO_SET)
+        if (learndata.global_board[gf] == Cell::NO_SET)
         {
             if (learndata.flat_board[pos0] == Cell::ME)
                 feature |= 1 << 9;
@@ -327,9 +327,9 @@ std::array<std::bitset<16>, 192> Features::MakeFeatures(LearnData learndata)
 std::string Features::GetPythonInverseIdxes()
 {
     std::string idxes_inv_local_py = "idxes_inv_local = [";
-    std::string idxes_inv_grobal_py = "idxes_inv_grobal = [";
+    std::string idxes_inv_global_py = "idxes_inv_global = [";
     std::array<std::vector<std::tuple<short, short>>, 81> idxes_inv_local = {};
-    std::array<std::vector<std::tuple<short, short>>, 9> idxes_inv_grobal = {};
+    std::array<std::vector<std::tuple<short, short>>, 9> idxes_inv_global = {};
 
     for (int i = 0; i < idxes.size(); i++)
     {
@@ -342,7 +342,7 @@ std::string Features::GetPythonInverseIdxes()
         idxes_inv_local[pos0].push_back(std::make_tuple(i, 0));
         idxes_inv_local[pos1].push_back(std::make_tuple(i, 1));
         idxes_inv_local[pos2].push_back(std::make_tuple(i, 2));
-        idxes_inv_grobal[gf].push_back(std::make_tuple(i, 3));
+        idxes_inv_global[gf].push_back(std::make_tuple(i, 3));
     }
 
     for (int i = 0; i < 81; i++)
@@ -358,16 +358,16 @@ std::string Features::GetPythonInverseIdxes()
 
     for (int i = 0; i < 9; i++)
     {
-        idxes_inv_grobal_py += "[";
-        for (auto &[feature_idx, out_idx] : idxes_inv_grobal[i])
-            idxes_inv_grobal_py += "(" + std::to_string(feature_idx) + "," + std::to_string(out_idx) + "),";
-        idxes_inv_grobal_py.pop_back();
-        idxes_inv_grobal_py += "],";
+        idxes_inv_global_py += "[";
+        for (auto &[feature_idx, out_idx] : idxes_inv_global[i])
+            idxes_inv_global_py += "(" + std::to_string(feature_idx) + "," + std::to_string(out_idx) + "),";
+        idxes_inv_global_py.pop_back();
+        idxes_inv_global_py += "],";
     }
-    idxes_inv_grobal_py.pop_back();
-    idxes_inv_grobal_py += "]";
+    idxes_inv_global_py.pop_back();
+    idxes_inv_global_py += "]";
 
-    return idxes_inv_local_py + idxes_inv_grobal_py;
+    return idxes_inv_local_py + idxes_inv_global_py;
 }
 
 std::string Features::GetPythonIdxes()

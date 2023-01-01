@@ -18,35 +18,35 @@ class Features:
         dic = json.loads(json_string)
         features = []
 
-        grobal_board = dic["grobal_board"]
+        global_board = dic["global_board"]
         flat_board = dic["flat_board"]
         legal_moves = dic["legal_moves"]
 
         for g0, g1, g2, gf, pos0, pos1, pos2, _ in Features.idxes:
             feature = [0 for _ in range(16)]
 
-            if grobal_board[g0] == 1:
+            if global_board[g0] == 1:
                 feature[0] = 1
-            elif grobal_board[g0] == 2:
+            elif global_board[g0] == 2:
                 feature[1] = 1
-            elif grobal_board[g0] == 3:
+            elif global_board[g0] == 3:
                 feature[2] = 1
 
-            if grobal_board[g1] == 1:
+            if global_board[g1] == 1:
                 feature[3] = 1
-            elif grobal_board[g1] == 2:
+            elif global_board[g1] == 2:
                 feature[4] = 1
-            elif grobal_board[g1] == 3:
+            elif global_board[g1] == 3:
                 feature[5] = 1
 
-            if grobal_board[g2] == 1:
+            if global_board[g2] == 1:
                 feature[6] = 1
-            elif grobal_board[g2] == 2:
+            elif global_board[g2] == 2:
                 feature[7] = 1
-            elif grobal_board[g2] == 3:
+            elif global_board[g2] == 3:
                 feature[8] = 1
 
-            if grobal_board[gf] == 0:
+            if global_board[gf] == 0:
                 if flat_board[pos0] == 1:
                     feature[9] = 1
                 elif flat_board[pos0] == 2:

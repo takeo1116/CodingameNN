@@ -51,11 +51,11 @@ public:
         }
         return flat_cell_board;
     }
-    std::array<Cell, 9> MakeFlatGrobalBoard()
+    std::array<Cell, 9> MakeFlatGlobalBoard()
     {
-        /*GrobalBoardを表すarrayを得る*/
+        /*GlobalBoardを表すarrayを得る*/
         std::array<Cell, 9> flat_cell_board = {};
-        std::array<Player, 9> flat_player_board = board.FlattenGrobalBoard();
+        std::array<Player, 9> flat_player_board = board.FlattenGlobalBoard();
         for (int pos = 0; pos < 9; pos++)
         {
             if (flat_player_board[pos] == Player::NO_SET)
@@ -114,9 +114,9 @@ public:
                 str += " ";
         }
         str += "| ";
-        auto grobal_flat_board = board.FlattenGrobalBoard();
+        auto global_flat_board = board.FlattenGlobalBoard();
         for (int i = 0; i < 9; i++)
-            str += (int)grobal_flat_board[i] + '0';
+            str += (int)global_flat_board[i] + '0';
         std::cout << str << std::endl;
         return str;
     }
