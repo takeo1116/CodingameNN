@@ -21,6 +21,7 @@ class Features:
         global_board = dic["global_board"]
         flat_board = dic["flat_board"]
         legal_moves = dic["legal_moves"]
+        turn = 81 - flat_board.count(0)
 
         for g0, g1, g2, gf, pos0, pos1, pos2, _ in Features.idxes:
             feature = [0 for _ in range(16)]
@@ -71,4 +72,4 @@ class Features:
 
         values.append(state_value)
 
-        return features, values
+        return features, values, turn

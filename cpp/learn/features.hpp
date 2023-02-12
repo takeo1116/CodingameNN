@@ -424,10 +424,12 @@ std::string Features::GetPythonOutMatrix()
 
     for (int pos = 0; pos < 82; pos++)
     {
+        int size = idxes_inv[pos].size();
         for (int idx : idxes_inv[pos])
         {
             idxes_a += std::to_string(idx) + ",";
             idxes_b += std::to_string(pos) + ",";
+            // values += std::to_string(1.0 / size) + ",";
             values += "1.0,";
         }
     }
