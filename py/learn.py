@@ -3,6 +3,7 @@
 import torch
 import os
 import argparse
+import matplotlib.pyplot as plt
 from torch import nn, optim
 from features import Features
 from network import PVNetwork, BigModel
@@ -57,6 +58,8 @@ torch.set_printoptions(edgeitems=1000)
 
 for epoch in range(100):
     model_path = f"{args.output_path}/models/state_{epoch}.pth"
+    correct = 0
+    loss_sum = 0.0
 
     for feature_tensor, value_tensor, turns_tensor in dataloader:
         optimizer.zero_grad()
@@ -68,11 +71,24 @@ for epoch in range(100):
         loss_p.backward()
         optimizer.step()
 
-        # torch.set_printoptions(sci_mode=False)
-        print("---")
-        print(f"pv: {softmax(p_out)}")
-        print(f"target: {value_tensor}")
-        print(f"turns: {turns_tensor}")
-        print(f"loss: {loss_p}")
+        _, target = torch.max(value_tensor, 1)
+        _, predicted = torch.max(p_out.data, 1)
+        # print(f"target: {target}")
+        # print(f"predicted: {predicted}")
+        correct += predicted.eq(target.data.view_as(predicted)).sum()
 
-    torch.save(model.state_dict(), model_path)
+        # torch.set_printoptions(sci_mode=False)
+        # print("---")
+        # print(f"pv: {softmax(p_out)}")
+        # print(f"target: {value_tensor}")
+        # print(f"turns: {turns_tensor}")
+        # print(f"loss: {loss_p}")
+
+    data_num = len(dataloader.dataset)
+    loss_mean = loss_sum / data_num
+    accuracy = correct / data_num
+
+    print(f"loss_mean: {loss_mean}")
+    print(f"accuracy: {accuracy}")
+
+    # torch.save(model.state_dict(), model_path)
