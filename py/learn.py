@@ -3,10 +3,10 @@
 import torch
 import os
 import argparse
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from torch import nn, optim
 from features import Features
-from network import PVNetwork, BigModel
+from network import PVNetwork
 from torch.utils.data import TensorDataset, DataLoader
 
 parser = argparse.ArgumentParser(description="棋譜データから教師あり学習を行う")
@@ -17,7 +17,7 @@ args = parser.parse_args()
 os.makedirs(args.output_path, exist_ok=True)
 os.makedirs(os.path.join(args.output_path, "models"), exist_ok=True)
 
-device = "cpu"
+device = "cuda"
 
 features = []
 values = []
@@ -37,6 +37,8 @@ for dir in dirs:
                 features.append(feature)
                 values.append(value)
                 turns.append(turn)
+    print(f"size: {len(features)}")
+    break
 
 features = torch.Tensor(features).to(device)
 values = torch.Tensor(values).to(device)
@@ -44,28 +46,36 @@ turns = torch.LongTensor(turns).to(device)
 
 dataset = TensorDataset(features, values, turns)
 
-dataloader = DataLoader(dataset, 100, shuffle=True)
+train_size = int(0.8 * len(dataset))
+test_size = len(dataset) - train_size
+
+print(train_size, test_size)
+
+train_dataset, test_dataset = torch.utils.data.random_split(dataset, [train_size, test_size])
+
+train_dataloader = DataLoader(train_dataset, 1000, shuffle=True)
+test_dataloader = DataLoader(test_dataset, 1000, shuffle=True)
 
 model = PVNetwork().to(device)
-# model = BigModel().to(device)
 
 optimizer = optim.Adagrad(model.parameters(), lr=0.01)
 softmax = nn.Softmax(dim=1)
 loss_fn_p = nn.CrossEntropyLoss()
 loss_fn_v = nn.MSELoss()
 
-torch.set_printoptions(edgeitems=1000)
-
-for epoch in range(100):
+for epoch in range(100000):
     model_path = f"{args.output_path}/models/state_{epoch}.pth"
     correct = 0
     loss_sum = 0.0
 
-    for feature_tensor, value_tensor, turns_tensor in dataloader:
+    model.train()
+    for feature_tensor, value_tensor, turns_tensor in train_dataloader:
         optimizer.zero_grad()
         p_out, v_out = model(feature_tensor)
         p_tensor, v_tensor = torch.split(value_tensor, [81, 1], dim=1)
+        # print(p_tensor)
         loss_p = loss_fn_p(p_out, p_tensor)
+        loss_sum += loss_p.item() * feature_tensor.shape[0]
         # loss_v = loss_fn_v(v_out, v_tensor)
         # loss = loss_p + loss_v
         loss_p.backward()
@@ -84,11 +94,30 @@ for epoch in range(100):
         # print(f"turns: {turns_tensor}")
         # print(f"loss: {loss_p}")
 
-    data_num = len(dataloader.dataset)
+    data_num = len(train_dataloader.dataset)
     loss_mean = loss_sum / data_num
     accuracy = correct / data_num
 
-    print(f"loss_mean: {loss_mean}")
-    print(f"accuracy: {accuracy}")
+    print(f"train_loss_mean: {loss_mean}")
+    print(f"train_accuracy: {accuracy}")
 
-    # torch.save(model.state_dict(), model_path)
+    correct = 0
+    loss_sum = 0.0
+    model.eval()
+    for feature_tensor, value_tensor, turns_tensor in test_dataloader:
+        p_out, v_out = model(feature_tensor)
+        p_tensor, v_tensor = torch.split(value_tensor, [81, 1], dim=1)
+        loss_p = loss_fn_p(p_out, p_tensor)
+        loss_sum += loss_p.item() * feature_tensor.shape[0]
+
+        _, target = torch.max(value_tensor, 1)
+        _, predicted = torch.max(p_out.data, 1)
+        correct += predicted.eq(target.data.view_as(predicted)).sum()
+    data_num = len(test_dataloader.dataset)
+    loss_mean = loss_sum / data_num
+    accuracy = correct / data_num
+
+    print(f"test_loss_mean: {loss_mean}")
+    print(f"test_accuracy: {accuracy}")
+
+    torch.save(model.state_dict(), model_path)
