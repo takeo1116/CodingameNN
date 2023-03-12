@@ -6,7 +6,7 @@
 #include <cfloat>
 #include "../engine/agent.hpp"
 
-class MctsAgent : public AgentBase
+class NeuralAgent : public AgentBase
 {
     private:
     
